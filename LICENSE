@@ -19,3 +19,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+-------------------------------------------------------------------------------
+
+RÉSUMÉ EN FRANÇAIS (à titre informatif)
+
+Ce résumé aide à comprendre la licence. Il n'a aucune valeur juridique : en
+cas de différence, seul le texte anglais ci-dessus fait foi.
+
+1. Utilisation personnelle
+   Vous pouvez librement télécharger, exécuter, étudier et modifier ce projet
+   pour un usage personnel, scolaire ou de recherche, sans demander
+   d'autorisation et sans payer.
+
+2. Utilisation commerciale
+   Vous pouvez utiliser ce projet dans un produit ou un service commercial,
+   le vendre, l'intégrer à un logiciel propriétaire (fermé) et le
+   redistribuer, modifié ou non. Vous n'êtes pas obligé de publier vos
+   propres modifications.
+
+3. Seule obligation : conserver la mention de copyright
+   Toute copie ou partie substantielle du projet doit inclure la ligne
+   « Copyright (c) 2026 Aymeric Thevenet » et le texte de cette licence.
+
+4. Propriété intellectuelle
+   - L'auteur reste titulaire du droit d'auteur sur le code d'origine. La
+     licence accorde des droits d'utilisation, elle ne transfère pas la
+     propriété.
+   - Vous êtes titulaire des droits sur vos propres modifications.
+   - Les contributions envoyées au projet (pull requests) sont publiées sous
+     cette même licence MIT, sauf mention contraire explicite.
+   - La licence ne donne aucun droit sur le nom du projet ou de l'auteur :
+     vous ne pouvez pas les utiliser pour laisser croire que l'auteur
+     soutient ou approuve votre produit.
+
+5. Composants tiers
+   Les dépendances listées dans requirements.txt (scikit-learn, FastAPI,
+   MLflow, pandas…) restent soumises à leurs propres licences, que vous
+   devez également respecter.
+
+6. Absence de garantie
+   Le projet est fourni « tel quel », sans aucune garantie. C'est un projet
+   pédagogique : l'auteur n'est pas responsable des dommages liés à son
+   utilisation, notamment des décisions prises à partir de ses prédictions.
