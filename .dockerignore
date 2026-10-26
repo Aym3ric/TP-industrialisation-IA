@@ -1,0 +1,42 @@
+# Tout ce qui n'entre pas dans le contexte de build ne peut pas finir dans l'image :
+# image plus légère, build plus rapide, et aucun secret embarqué par erreur.
+
+# Git et outils
+.git
+.gitignore
+.github
+.idea
+.vscode
+.DS_Store
+
+# Python : caches et environnements locaux
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets et configuration locale : JAMAIS dans l'image
+.env
+.env.*
+
+# Artefacts locaux (le modèle est réentraîné dans le stage `test`)
+artifacts/
+notebooks/
+mlruns/
+mlartifacts/
+*.joblib
+
+# Documentation
+*.md
+*.pdf
+LICENSE
+
+# Fichiers Docker eux-mêmes
+Dockerfile
+.dockerignore
+docker-compose*.yml

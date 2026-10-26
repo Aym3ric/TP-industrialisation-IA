@@ -107,6 +107,41 @@ La documentation interactive est ensuite disponible sur <http://127.0.0.1:8000/d
 
 Codes de sortie de la CLI : `0` en cas de succès, `1` en cas d'échec (utile en CI).
 
+## Docker
+
+L'image se construit en plusieurs étapes (*multi-stage*) : une image de **test** complète installe les dépendances, lance les tests et entraîne le modèle. L'image de **production** (`python:3.13-slim`) ne reçoit que l'environnement virtuel nettoyé, le code et le modèle entraîné.
+
+```bash
+# Construire et lancer l'API (http://127.0.0.1:8000)
+docker compose up --build -d
+
+# Vérifier l'état (healthy = modèle chargé)
+docker compose ps
+
+# Arrêter
+docker compose down
+```
+
+Sans Compose :
+
+```bash
+docker build -t livraison-express-lite .
+docker run --rm -p 127.0.0.1:8000:8000 -e MODEL_THRESHOLD=0.6 livraison-express-lite
+```
+
+Pour construire uniquement l'image de test : `docker build --target test -t livraison-express-lite:test .`
+
+| Mesure | Détail |
+|---|---|
+| **Optimisation** | build multi-stage, image de base `slim`, `.dockerignore` (pas de `.git`, docs, notebook, `.env`), couche des dépendances mise en cache, suites de tests des bibliothèques et `pip` retirés |
+| **Rootless** | exécution sous l'utilisateur `app` (UID 10001), sans shell |
+| **Secrets** | aucun `.env` dans l'image : la configuration passe par `-e` / `environment:` à l'exécution |
+| **Ports** | seul le port `8000` est exposé, publié sur `127.0.0.1` par défaut |
+| **Durcissement (Compose)** | système de fichiers en lecture seule, `cap_drop: ALL`, `no-new-privileges`, limites CPU / mémoire |
+| **Supervision** | `HEALTHCHECK` sur `/health/ready` |
+
+Taille mesurée : environ **1,8 Go** pour l'image de test et **800 Mo** pour l'image de production. Ce volume vient surtout de MLflow et de ses dépendances (pyarrow, scipy…).
+
 ## API HTTP
 
 | Endpoint | Méthode | Description | Erreur possible |

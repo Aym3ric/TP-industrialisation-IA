@@ -1,0 +1,55 @@
+# Lancer l'API :            docker compose up --build -d
+# Vérifier l'état :         docker compose ps
+# Arrêter :                 docker compose down
+#
+# Les variables viennent de l'environnement du shell ou du fichier .env à côté de ce
+# fichier (lu par Compose sur l'hôte, jamais copié dans l'image).
+
+services:
+  api:
+    build:
+      context: .
+      target: prod
+    image: livraison-express-lite:latest
+    container_name: livraison-express-lite
+    restart: unless-stopped
+
+    # Seul le port de l'API est publié, et uniquement sur la machine locale.
+    # Remplacer par "8000:8000" pour l'exposer au réseau (derrière un reverse proxy).
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+
+    # Configuration injectée à l'exécution (pas de .env dans l'image).
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-prod}
+      MODEL_THRESHOLD: ${MODEL_THRESHOLD:-0.5}
+      MODEL_VERSION: ${MODEL_VERSION:-1.0.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+    # --- Sécurisation ---
+    user: "10001:10001"          # rootless (déjà le cas dans l'image, réaffirmé ici)
+    read_only: true              # système de fichiers en lecture seule
+    tmpfs:
+      - /tmp                     # seul espace inscriptible, en mémoire
+    cap_drop:
+      - ALL                      # aucune capacité Linux n'est nécessaire
+    security_opt:
+      - no-new-privileges:true   # interdit toute élévation de privilèges
+
+    # --- Ressources ---
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=4).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
