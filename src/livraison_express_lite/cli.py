@@ -20,17 +20,15 @@ un faux succès).
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict
 import json
 import logging
 import sys
 import time
 import traceback
+from dataclasses import asdict
 from pathlib import Path
 
 from src.livraison_express_lite.domain.entities import OrderEntity
-from src.livraison_express_lite.core.learning.ml_trainer import MLTrainer
-from src.livraison_express_lite.infrastructure.order_repository import OrderRepository
 
 logger = logging.getLogger(__name__)
 

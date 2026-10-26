@@ -19,6 +19,11 @@ where = ["src"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
+[tool.pytest.ini_options]
+# Racine du dépôt dans le sys.path : le code importe `src.livraison_express_lite`.
+pythonpath = ["."]
+testpaths = ["tests"]
+
 [tool.ruff]
 target-version = "py313"
 line-length = 100

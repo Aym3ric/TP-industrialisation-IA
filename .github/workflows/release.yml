@@ -1,0 +1,61 @@
+# Livraison continue : à la publication d'une release GitHub (tag X.Y.Z créé depuis
+# main, cf. GitFlow), on teste puis on construit et publie l'image sur ghcr.io.
+#
+#   release publiée (tag 0.2.0) ──► CI ──► build ──► ghcr.io/<owner>/<repo>:0.2.0
+#                                                                    :0.2
+#                                                                    :latest
+name: Release Docker
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Build & push ghcr.io
+    runs-on: ubuntu-latest
+    needs: ci
+    permissions:
+      contents: read
+      packages: write   # nécessaire pour pousser sur ghcr.io avec GITHUB_TOKEN
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # GITHUB_TOKEN suffit pour publier dans le registre du propriétaire du dépôt :
+      # pas besoin de Personal Access Token pour ce cas simple.
+      - name: Connexion à ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tags Semantic Versioning déduits du tag Git (avec ou sans préfixe « v ») :
+      # 0.2.0, 0.2 et latest (latest uniquement pour une release non « pre-release »).
+      - name: Métadonnées de l'image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

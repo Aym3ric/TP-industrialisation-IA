@@ -1,12 +1,3 @@
-# syntax=docker/dockerfile:1
-#
-# Build multi-stage : on part d'une image lourde (Debian complète) pour installer et
-# tester, puis on ne recopie dans une image minimale que ce qui sert à l'exécution.
-#
-#   deps ──► test ──────► (artefact du modèle) ──┐
-#     │                                          ▼
-#     └──► slim-venv ──► (venv nettoyé) ──────► prod   venv + code + modèle, rien d'autre
-#
 # Construire l'image de production (cible par défaut) :
 #   docker build -t livraison-express-lite .
 # Construire uniquement l'image de test :
@@ -38,17 +29,20 @@ RUN pip install -r requirements.txt
 # -----------------------------------------------------------------------------
 FROM deps AS test
 
-RUN pip install pytest
-
 WORKDIR /app
+
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install -r requirements-dev.txt
+
 # Tout le contexte filtré par .dockerignore : code, tests éventuels, order.json.
 COPY . .
 
 ENV MODEL_PATH=/app/models/express_delivery_model.joblib \
     MLFLOW_TRACKING_URI=sqlite:////tmp/mlflow.db
 
-# Tests unitaires s'ils existent (pytest renvoie 5 quand il n'y a aucun test).
-RUN pytest -q || [ $? -eq 5 ]
+# Lint et tests unitaires.
+RUN ruff check --no-cache . \
+ && pytest -q -p no:cacheprovider
 
 # Entraînement (graine fixe : reproductible) puis test de fumée de la prédiction.
 RUN python -m src.livraison_express_lite train \

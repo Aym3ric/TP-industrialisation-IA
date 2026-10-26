@@ -1,0 +1,6 @@
+# Dépendances de développement et de CI : jamais installées dans l'image de production.
+-r requirements.txt
+
+pytest==9.1.1
+httpx==0.28.1  # requis par fastapi.testclient.TestClient
+ruff==0.17.2
