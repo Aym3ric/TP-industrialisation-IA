@@ -19,6 +19,8 @@ on:
     branches:
       - release
       - "release/**"
+  # Lancement manuel : Actions → Release Docker → Run workflow (choisir la branche release).
+  workflow_dispatch:
 
 jobs:
   release:
