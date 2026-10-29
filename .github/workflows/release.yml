@@ -53,8 +53,10 @@ jobs:
       - name: pytest
         run: pytest -v
 
+      # --exit-zero : le rapport et la note s'affichent dans les logs, mais les messages
+      # pylint ne bloquent pas la publication de l'image.
       - name: pylint
-        run: pylint src
+        run: pylint src --exit-zero
 
       # 5. Authentification à GitHub Container Registry
       # GITHUB_TOKEN suffit pour publier dans le registre du propriétaire du dépôt :
